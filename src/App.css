@@ -1,0 +1,269 @@
+p,html{
+  margin: 0px;
+  font-size: 15px;
+}
+
+@font-face {
+  font-family: 'Aclonica';
+  src: local('Aclonica'), url(./fonts/Aclonica-Regular.ttf) format('truetype');
+}
+
+.App {
+  text-align: center;
+}
+
+.carga_inicio{ 
+  width: 100px;
+  height: 100px; 
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .carga_inicio{
+    animation: logo-spin infinite 5s linear;
+  }
+}
+
+.encabezados{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 15px; 
+}
+
+.App-header {
+  /* background-color: #282c34; */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+ 
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logo-GASM{ 
+  width: 150px;
+  height: 150px; 
+}
+
+.logo-home{  
+  width: 180px;
+  height: 180px;    
+}
+
+.logo-report{  
+  width: 250px;
+  height: 190px;    
+}
+
+.texto_inicio{
+  margin-top: 25px;
+  font-family: Aclonica;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 32px;
+  color: #6C63FF;
+}
+
+.cabecera{
+  display: flex;
+  margin-top: 52px;
+}
+
+.texto_cabecera{
+  font-family: Aclonica;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 76px;
+  color: rgba(6, 4, 31, 0.81);
+  margin-top: 60px;
+  margin-left: 20%;
+}
+
+.seccion_calculos{
+  display: flex;
+  flex-direction: column;
+  margin-left: 150px;
+}
+
+.fila{
+  display: flex;
+  flex-direction: row; 
+}
+
+.columna{
+  display: flex;
+  flex-direction: column; 
+  justify-content: space-around;
+}
+
+.borde{
+  border:red 5px solid;  
+}
+
+.caja_texto{
+  width: 400px;
+  height: 30px; 
+  background: #FFFFFF;
+  border: 1px solid #8D9EC9;
+  box-sizing: border-box;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;  
+  font-family: Aclonica;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  color: #6C63FF;
+}
+
+.caja_texto_tienda{
+  width: 400px;
+  height: 45px; 
+  background: #FFFFFF;
+  border: 1px solid #8D9EC9;
+  box-sizing: border-box;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 14px;  
+  font-family: Aclonica;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 22px;
+  color: #6C63FF;
+  margin-bottom: 10px;
+}
+
+.mandar_abajo{
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 30px;
+  margin-left: 20px;
+}
+
+.centrar_imagen{
+  display: flex;
+}
+
+.boton{
+  font-family: Aclonica;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 21px;
+  width: 127px;
+  height: 41px;
+  background: #6C63FF;
+  border-radius: 20px;
+  color: white;
+  margin-left: 738px;
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 25%);  
+  /* border: rgb(100, 98, 98) 1px solid; */
+}
+
+.lista_remision_folio{
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 5px;
+}
+
+.lista_remision_cliente{
+  text-align: justify;
+  margin-left: 10px;
+}
+
+.lista_remision_total{
+  width: 400px;    
+  display: flex;
+  justify-content: flex-end;
+}
+
+.lista_remision_fecha{
+  width: 100px;  
+  margin-right: 5px;
+}
+
+.remisiones_cantidad{
+  max-width: 24px;
+  margin-right: 5px;
+}
+
+.remisiones_producto{
+  text-align: justify;
+}
+
+.remisiones_total{    
+  display: flex;
+  justify-content: flex-end;  
+}
+
+.texto{
+  font-family: Aclonica;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 21px;
+  color: #6C63FF;
+}
+
+/* Add a black background color to the top navigation */
+.topnav {  
+  background-color: rgba(6, 4, 31, 0.81);
+  position: absolute;
+  overflow: hidden;
+  top: 0px;  
+  width: 100%;
+  left: 0px;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: right;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  font-family: Aclonica;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #6C63FF;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #6C63FF;
+  color: white;
+}
+
+.lista_impresion{
+  background-color: rgba(6, 4, 31, 0.81);
+  color: white;
+  padding: 14px 16px;
+  font-family: Aclonica;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  width: 80%;
+  border-radius: 19px;
+}
+
+.lista_impresion:hover{  
+  cursor: pointer;
+}
+
+a:hover{
+  cursor:pointer;
+}
