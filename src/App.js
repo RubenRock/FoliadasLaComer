@@ -1,6 +1,5 @@
 import React from 'react';
 import './App.css';
-import 'dotenv/config';
 
 import {useEffect, useState} from 'react'
 import logoComer from './img/logo_comer.png'

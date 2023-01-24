@@ -1,6 +1,5 @@
 import React from 'react';
 import '../App.css'
-import { PDFExport } from 'react-pdf';
 
 const changeBack = (e) =>{
     e.target.style.background === 'blue' ?
