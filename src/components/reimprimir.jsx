@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import '../App.css'
 
@@ -28,12 +29,12 @@ const changeBack = (e) =>{
   const cabecera_mercado = (ancho_pantalla) =>{
     return(
       <div className='encabezados'>
-        <p style={{fontWeight:'bold',textAlign:'center',fontSize:'13px'}}>CARLOS ARTURO ARGUELLO GORDILLO</p>
-        <p> GRUPO ABARROTERO SAN MARTIN </p>
-        <p> SUCURSAL "MERCADO" </p>
-        <p>RFC: AUGC-940427-UB1</p>
+        <p style={{fontWeight:'bold',textAlign:'center',fontSize:'13px'}}>CP OSCAR ORLANDO ARGUELLO GORDILLO</p>
+        <p> ABARROTES MERCADO </p>
+        <p>RFC: AUGO860221D33</p>
         <p>2A AV. ORIENTE NORTE NUM. 15</p>
         <p>TEL: 963-63-6-08-54</p>
+        <p>CELULAR: 963-13-8-90-90</p>
         <p>LAS MARGARITAS, CHIAPAS</p>
         <br/>
         <div style={{display:'flex',justifyContent:'flex-end',width:ancho_pantalla}}>
@@ -64,7 +65,7 @@ const changeBack = (e) =>{
   const cabecera_comercial = (ancho_pantalla) =>{
     return(
       <div className='encabezados'>
-        <p style={{fontWeight:'bold',textAlign:'center',fontSize:'14px'}}>OSCAR ORLANDO ARGUELLO GORDILLO</p>        
+        <p style={{fontWeight:'bold',textAlign:'center',fontSize:'14px'}}>CP OSCAR ORLANDO ARGUELLO GORDILLO</p>        
         <p> ABARROTES LA COMERCIAL </p>
         <p>RFC: AUGO860221D33</p>
         <p>2A. CALLE NORTE ORIENTE No.22</p>
@@ -154,7 +155,7 @@ export const Reimprimir = (props) =>{
                                 <p className='lista_remision_total' style={{width:'150px'}}> {parseFloat(item.tasa16).toFixed(2)} </p> 
                             </div>
                             <div className='fila' style={{fontSize:letra_chica}}>
-                                <p className='lista_remision_total'> IESP: $ </p> 
+                                <p className='lista_remision_total'> IEPS: $ </p> 
                                 <p className='lista_remision_total' style={{width:'150px'}}> {parseFloat(item.tasa8).toFixed(2)} </p> 
                             </div>
                             <div className='fila'style={{fontWeight:'bold'}}>

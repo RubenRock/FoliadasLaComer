@@ -1,3 +1,4 @@
+/* eslint-disable */
 function ObtenerProductos (total, productos, empaques,tasa,total_por_nota, excedente){
     let sumaAcumulada = 0
     let total_linea = 0

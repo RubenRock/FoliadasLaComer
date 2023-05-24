@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const crearTablas = () =>{
     var db = openDatabase('db_foliadas', '1.0', 'Foliadas', 2 * 1024 * 1024);
     db.transaction(function (tx) {
