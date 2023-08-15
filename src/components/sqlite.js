@@ -122,5 +122,21 @@ export const folioMax =  (tienda) => new Promise((resolve, reject) =>{
     ()=> console.log('formateo correcto'));
 }
 
+export const EjecutarSQL = (query) => new Promise((resolve, reject) => {
+        var db = openDatabase('db_foliadas', '1.0', 'Foliadas', 2 * 1024 * 1024);
+        db.transaction(function (tx) {
+            tx.executeSql(
+                query,
+                [],
+                function (tx, result) {
+                    resolve(result); // Resolvemos con el resultado de la consulta
+                },
+                function (tx, error) {
+                    reject(error); // Rechazamos con el error si la consulta falla
+                }
+            );
+        });
+    });
+
 
 

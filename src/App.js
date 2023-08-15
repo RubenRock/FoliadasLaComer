@@ -28,6 +28,7 @@ function App() {
   const [mostrarUno, setMostrarUno] = useState(false) //no mostrar la lista de reimpresion individual de notas
   const [folio, setFolio] = useState(0)
   const [modificarFolio, setModificarFolio] = useState(false)
+  const [mostrarSql, setMostrarSql ] = useState (false)
   
   const leerDatos = async () =>{
     setEmpaques([])
@@ -202,11 +203,14 @@ function App() {
         setRemprimirRemisiones(e.remisiones)
         setReimprimir(true) 
       }
-    })
-        
+    })        
   }
 
-
+  const ejecutarSQL = (query) => {
+    Sqlite.EjecutarSQL(query).then( e =>{
+      console.log(e);
+    })
+  }
 
   const leerFolio = async(tienda)=>{    
     setFolio(await Sqlite.folioMax(tienda))    
@@ -384,7 +388,23 @@ function App() {
                 onMouseEnter={(e) => changeBack(e)}
                 onMouseLeave={(e) => changeBack(e)}
               >Crear</button>
+
+              <p className='texto_sql'
+                onClick={() => setMostrarSql(!(mostrarSql))}>ejecutar SQL</p>
             </div>
+            
+            {mostrarSql ?
+              <div id = 'espacio_sql' >
+                <textarea className='caja_texto' id = 'btn_ejecutar_sql'
+                  style={{height: '100px'}}/>
+
+                <button className='boton' 
+                  onClick={() => ejecutarSQL(document.getElementById('btn_ejecutar_sql').value)}                 
+                >Ejecutar</button>
+                
+              </div>
+              : null
+            }
 
     </div>
 

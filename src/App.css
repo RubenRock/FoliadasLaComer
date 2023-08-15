@@ -267,3 +267,23 @@ p,html{
 a:hover{
   cursor:pointer;
 }
+
+.texto_sql{
+  font-family: Aclonica;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  color: #6C63FF;
+  display: flex;
+  margin-left: 15px;
+}
+
+.texto_sql:hover{
+  cursor: pointer;
+}
+
+#espacio_sql{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
