@@ -111,6 +111,7 @@ function App() {
 
   useEffect(() =>{
     leerDatos()    
+    Sqlite.crearTablas()
   },[]) 
 
   
