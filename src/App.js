@@ -11,7 +11,6 @@ import printer from './img/printer.svg'
 import * as ObtenerNotas from './components/obtenerNotas'
 import * as Sqlite from './components/sqlite'
 import { Reimprimir } from './components/reimprimir'
-import * as urlVercel from './components/urls'
 
 function App() {
 
@@ -32,15 +31,15 @@ function App() {
   
   const leerDatos = async () =>{
     setEmpaques([])
-    let clientes = await fetch(urlVercel.Urlclientes)
+    let clientes = await fetch('https://vercel-api-eta.vercel.app/api/clientes')
     let datos = await clientes.json()
     setClientes(datos)    
 
-    let response = await fetch(urlVercel.Urlcnventario)        
+    let response = await fetch('https://vercel-api-eta.vercel.app/api/inventario')        
     let data = await response.json()           
     setProductos(data)
 
-    response = await fetch(urlVercel.Urlpaquete  )        
+    response = await fetch('https://vercel-api-eta.vercel.app/api/empaque')        
     data = await response.json()       
     setEmpaques(data) 
   }

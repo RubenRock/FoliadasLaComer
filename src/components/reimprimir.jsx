@@ -111,8 +111,8 @@ export const Reimprimir = (props) =>{
                                                       
                         <div style={{display:'none'}}> {/* muestra en pantalla los acumuladores */}
                             {index === 0 ? folioini = item.folio : foliofin = item.folio}
-                            { iva += parseFloat(item.tasa16)}
-                            { ieps += parseFloat(item.tasa8) }
+                            { iva += parseFloat(item.tasas.tasa16)}
+                            { ieps += parseFloat(item.tasas.tasa8) }
                             { total += parseFloat(item.total)}
                         </div>
                         
@@ -148,15 +148,15 @@ export const Reimprimir = (props) =>{
 
                             <div className='fila' style={{fontSize:letra_chica}}>
                                 <p className='lista_remision_total'> TASA 0%: $ </p> 
-                                <p className='lista_remision_total' style={{width:'150px'}}> {parseFloat(item.tasa0).toFixed(2)} </p> 
+                                <p className='lista_remision_total' style={{width:'150px'}}> {parseFloat(item.tasas.tasa0).toFixed(2)} </p> 
                             </div>
                             <div className='fila' style={{fontSize:letra_chica}}>
                                 <p className='lista_remision_total'> IVA: $ </p> 
-                                <p className='lista_remision_total' style={{width:'150px'}}> {parseFloat(item.tasa16).toFixed(2)} </p> 
+                                <p className='lista_remision_total' style={{width:'150px'}}> {parseFloat(item.tasas.tasa16).toFixed(2)} </p> 
                             </div>
                             <div className='fila' style={{fontSize:letra_chica}}>
                                 <p className='lista_remision_total'> IEPS: $ </p> 
-                                <p className='lista_remision_total' style={{width:'150px'}}> {parseFloat(item.tasa8).toFixed(2)} </p> 
+                                <p className='lista_remision_total' style={{width:'150px'}}> {parseFloat(item.tasas.tasa8).toFixed(2)} </p> 
                             </div>
                             <div className='fila'style={{fontWeight:'bold'}}>
                                 <p className='lista_remision_total'> TOTAL: $ </p> 
