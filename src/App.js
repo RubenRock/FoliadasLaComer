@@ -11,6 +11,7 @@ import printer from './img/printer.svg'
 import * as ObtenerNotas from './components/obtenerNotas'
 import * as Sqlite from './components/sqlite'
 import { Reimprimir } from './components/reimprimir'
+import { inventario, empaque } from './components/dataLocal';
 
 function App() {
 
@@ -31,17 +32,17 @@ function App() {
   
   const leerDatos = async () =>{
     setEmpaques([])
-    let clientes = await fetch('https://vercel-api-eta.vercel.app/api/clientes')
-    let datos = await clientes.json()
-    setClientes(datos)    
+    //let clientes = await fetch('https://vercel-api-eta.vercel.app/api/clientes')
+    //let datos = await clientes.json()
+    //setClientes(datos)    
 
-    let response = await fetch('https://vercel-api-eta.vercel.app/api/inventario')        
-    let data = await response.json()           
-    setProductos(data)
+    //let response = await fetch('https://vercel-api-eta.vercel.app/api/inventario')        
+    //let data = await response.json()           
+    setProductos(inventario)
 
-    response = await fetch('https://vercel-api-eta.vercel.app/api/empaque')        
-    data = await response.json()       
-    setEmpaques(data) 
+    //response = await fetch('https://vercel-api-eta.vercel.app/api/empaque')        
+    //data = await response.json()       
+    setEmpaques(empaque) 
   }
 
   const obtenerDatos = () =>{
@@ -311,7 +312,7 @@ function App() {
       if (currentDate.getDay() !== 0) {
         bloques.push(
           <div key={currentDate} >
-            <p className='texto'>
+            <p className='texto_dias'>
               {`${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`}
             </p>
             <div className='fila' style={{gap:'15px', marginBottom:'20px'}}>
@@ -368,14 +369,27 @@ function App() {
                   })
                 }
               />
-              </div>
+
+              <button className='boton_generar' 
+                onClick={() => obtenerDatos()}                 
+              >Generar</button>
             </div>
+
+          </div>
         );
       }else{
-        console.log('es domingo');
+        bloques.push(
+          <div key={currentDate}>
+            <p className='texto_dias'>
+              {`${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`}
+            </p>
+            <p className='texto' style={{display:'flex', marginBottom:'15px'}}>Domingo</p>
+          </div>
+        )
       }
       currentDate.setDate(currentDate.getDate() + 1);
     }
+    console.log({bloques})
     return bloques;
   }
 
