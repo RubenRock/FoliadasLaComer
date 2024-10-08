@@ -14,7 +14,7 @@ import { Reimprimir } from './components/reimprimir'
 
 function App() {
 
-  const [datosCapturados,setDatosCapturados] = useState ({'tienda':'nada','total':'','iva':'','ieps':'','notas':'','excedente':'', 'fecha':''})
+  const [datosCapturados,setDatosCapturados] = useState ({'tienda':'nada','total':'','iva':'','ieps':'','notas':'','excedente':'', 'fecha':'', 'fechaFin':''})
   const [productos, setProductos] = useState([])
   const [empaques, setEmpaques] = useState([])
   const [clientes, setClientes] = useState([])
@@ -299,6 +299,86 @@ function App() {
     )
   }
 
+  const recorrerFechas = () => {
+    let currentDate = new Date(datosCapturados.fecha);
+    let finalDate = new Date(datosCapturados.fechaFin);
+    let bloques = [];
+    //le agrego un dia porque empieza en un dia anterior
+    currentDate.setDate(currentDate.getDate() + 1);
+    finalDate.setDate(finalDate.getDate() + 1);
+      
+    while (currentDate <= finalDate) {  
+      if (currentDate.getDay() !== 0) {
+        bloques.push(
+          <div key={currentDate} >
+            <p className='texto'>
+              {`${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`}
+            </p>
+            <div className='fila' style={{gap:'15px', marginBottom:'20px'}}>
+              <input
+                type='number'
+                placeholder='Total'
+                className='caja_texto'
+                style={{ width: '120px', height: '25px' }}
+                value={datosCapturados.total}
+                onChange={(e) =>
+                  setDatosCapturados({ ...datosCapturados, total: e.target.value })
+                }
+              />
+              <input
+                type='number'
+                placeholder='IVA'
+                className='caja_texto'
+                style={{ width: '120px', height: '25px' }}
+                value={datosCapturados.iva}
+                onChange={(e) =>
+                  setDatosCapturados({ ...datosCapturados, iva: e.target.value })
+                }
+              />
+              <input
+                type='number'
+                placeholder='IEPS'
+                className='caja_texto'
+                style={{ width: '120px', height: '25px' }}
+                value={datosCapturados.ieps}
+                onChange={(e) =>
+                  setDatosCapturados({ ...datosCapturados, ieps: e.target.value })
+                }
+              />
+              <input
+                type='number'
+                placeholder='# notas'
+                className='caja_texto'
+                style={{ width: '120px', height: '25px' }}
+                value={datosCapturados.notas}
+                onChange={(e) =>
+                  setDatosCapturados({ ...datosCapturados, notas: e.target.value })
+                }
+              />
+              <input
+                type='number'
+                placeholder='Excedente'
+                className='caja_texto'
+                style={{ width: '120px', height: '25px' }}
+                value={datosCapturados.excedente}
+                onChange={(e) =>
+                  setDatosCapturados({
+                    ...datosCapturados,
+                    excedente: e.target.value,
+                  })
+                }
+              />
+              </div>
+            </div>
+        );
+      }else{
+        console.log('es domingo');
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return bloques;
+  }
+
   const pantalla_principal = 
     <div>
             <div className="topnav">
@@ -318,9 +398,18 @@ function App() {
                   <img src={home_img} className='logo-home'  alt="home" />       
                   <div className='mandar_abajo '>
                     <div className='columna'>
-                      <div style={{display:'flex',justifyContent:'flex-end'}}>
-                        <input type="date"  className='caja_texto_tienda' style={{width: '220px'}} value={datosCapturados.fecha}
-                          onChange={(e) => setDatosCapturados({...datosCapturados,'fecha':e.target.value})}/>
+                      <div style={{display:'flex',justifyContent:'space-between'}}>
+                        <div className='columna'>
+                          <p className='texto'>Del:</p>
+                          <input type="date"  className='caja_texto_tienda' style={{width: '180px', fontSize:'19px'}} value={datosCapturados.fecha}
+                            onChange={(e) => setDatosCapturados({...datosCapturados,'fecha':e.target.value})}/>
+                        </div>
+
+                        <div style={{display:'flex', flexDirection:'column'}}>
+                          <p className='texto'>al:</p>
+                          <input type="date"  className='caja_texto_tienda' style={{width: '180px', fontSize:'19px'}} value={datosCapturados.fechaFin}
+                            onChange={(e) => setDatosCapturados({...datosCapturados,'fechaFin':e.target.value})}/>
+                        </div>
                       </div>
                       
                       <select className='caja_texto_tienda' placeholder='Tienda' type="search" value={datosCapturados.tienda}
@@ -352,32 +441,9 @@ function App() {
                     </div>
                   </div>
               </div>
-              <div className='fila' style={{marginLeft:'50px'}}>
-                <div className='centrar_imagen'>
-                  <img src={report_img} className='logo-report'  alt="report" />       
-                </div>
-                <div className='columna'>
-                  <input type='number' placeholder='Total' className='caja_texto' style={{width:'299px',height:'30px'}} value={datosCapturados.total} 
-                      onChange={(e) => setDatosCapturados({...datosCapturados,'total':e.target.value})
-                    } 
-                  />
-                  <input type='number' placeholder='IVA' className='caja_texto' style={{width:'299px',height:'30px'}}  value={datosCapturados.iva}
-                      onChange={(e) => setDatosCapturados({...datosCapturados,'iva':e.target.value})
-                    } 
-                  />
-                  <input type='number' placeholder='IEPS'className='caja_texto' style={{width:'299px',height:'30px'}} value={datosCapturados.ieps}
-                      onChange={(e) => setDatosCapturados({...datosCapturados,'ieps':e.target.value})
-                    } 
-                  />
-                  
-                  <input type='number' placeholder='Numero de notas'className='caja_texto' style={{width:'299px',height:'30px'}} value={datosCapturados.notas}
-                      onChange={(e) => setDatosCapturados({...datosCapturados,'notas':e.target.value})
-                    } 
-                  />
-                  <input type='number' placeholder='Excedente permitido' className='caja_texto' style={{width:'299px',height:'30px'}} value={datosCapturados.excedente}
-                      onChange={(e) => setDatosCapturados({...datosCapturados,'excedente':e.target.value})
-                    } 
-                  />
+              <div className='fila'>                
+                <div>
+                  {recorrerFechas()}
                 </div>
               </div>
             </div>
@@ -390,7 +456,12 @@ function App() {
               >Crear</button>
 
               <p className='texto_sql'
-                onClick={() => setMostrarSql(!(mostrarSql))}>ejecutar SQL</p>
+                onClick={() => setMostrarSql(!(mostrarSql))}>ejecutar SQL
+              </p>
+
+              <p className='texto_sql'
+                onClick={() => recorrerFechas()}>ejecutar fechas
+              </p>
             </div>
             
             {mostrarSql ?

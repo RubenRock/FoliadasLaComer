@@ -91,13 +91,13 @@ p,html{
   font-size: 76px;
   color: rgba(6, 4, 31, 0.81);
   margin-top: 60px;
-  margin-left: 20%;
+  width: 100%;
 }
 
 .seccion_calculos{
   display: flex;
   flex-direction: column;
-  margin-left: 150px;
+  align-items: center;
 }
 
 .fila{
