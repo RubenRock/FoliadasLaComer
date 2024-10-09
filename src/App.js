@@ -11,11 +11,11 @@ import printer from './img/printer.svg'
 import * as ObtenerNotas from './components/obtenerNotas'
 import * as Sqlite from './components/sqlite'
 import { Reimprimir } from './components/reimprimir'
-import { inventario, empaque } from './components/dataLocal';
+import { inventario, empaque, clientesLocal } from './components/dataLocal';
 
 function App() {
 
-  const [datosCapturados,setDatosCapturados] = useState ({'tienda':'nada','total':'','iva':'','ieps':'','notas':'','excedente':'', 'fecha':'', 'fechaFin':''})
+  const [datosCapturados,setDatosCapturados] = useState ({'tienda':'nada','fecha':'', 'fechaFin':''})
   const [productos, setProductos] = useState([])
   const [empaques, setEmpaques] = useState([])
   const [clientes, setClientes] = useState([])
@@ -34,7 +34,7 @@ function App() {
     setEmpaques([])
     //let clientes = await fetch('https://vercel-api-eta.vercel.app/api/clientes')
     //let datos = await clientes.json()
-    //setClientes(datos)    
+    setClientes(clientesLocal)    
 
     //let response = await fetch('https://vercel-api-eta.vercel.app/api/inventario')        
     //let data = await response.json()           
@@ -300,6 +300,197 @@ function App() {
     )
   }
 
+  const handleInputChange = (fecha, e) => {    
+    let value = e.target.value;    
+    let campo = e.target.name;
+
+    setDatosCapturados((prevState) => ({
+      ...prevState,
+      [fecha]: {
+        ...prevState[fecha],
+        [campo]: value,
+      },
+    }));
+  };
+
+  const obtenerDatosLinea = (fecha) => {
+    const datos = datosCapturados[fecha];       
+    
+    if (datos && datos.total && datos.iva && datos.ieps && datos.notas && datos.excedente){
+      datos.tienda = datosCapturados.tienda; 
+      //dar formato año/mes/dia     
+      const [dia, mes, año] = fecha.split('/');
+      const nuevaFecha = `${año}/${mes}/${dia}`;
+      datos.fecha = nuevaFecha;//  yyyy/mm/dd 
+      datos.fechaNormal = fecha;//  dd/mm/yyyy      
+      generarDatos(datos)
+    }else{
+      alert('Faltan datos');    
+    }
+    
+  };
+
+  const mostrarListaRemisiones = (fecha) =>{ 
+    let total=0, iva = 0, ieps = 0, folioini=0, foliofin=0
+    let ancho_pantalla = '350px', letra_chica = '13px'
+    let resul=
+    <div>
+                            
+            <button className='boton' 
+                onClick={() => regresar()} 
+                onMouseEnter={(e) => changeBack(e)}
+                onMouseLeave={(e) => changeBack(e)}                  
+            >regresar</button>                     
+            
+
+            <div style={{width:ancho_pantalla}}> {/* ancho de la hoja de impresion */}
+                {listaRemision_Creada[fecha] && listaRemision_Creada[fecha].map((item, index) =>  <div key={index}>                                                  
+                                                    
+                                                    <div style={{display:'none'}}> {/* muestra en pantalla los acumuladores */}
+                                                        {index === 0 ? folioini = item.folio : foliofin = item.folio}
+                                                        { iva += item.tasas.tasa16}
+                                                        { ieps += item.tasas.tasa8 }
+                                                        { total += item.total}
+                                                    </div>
+
+                                                    {/* verifico que tienda es para poner su encabezado */}
+                                                    { datosCapturados.tienda ==='matriz' ? cabecera_matriz(ancho_pantalla) : null}
+                                                    { datosCapturados.tienda ==='mercado' ? cabecera_mercado(ancho_pantalla) : null}
+                                                    { datosCapturados.tienda ==='lorena' ? cabecera_lorena(ancho_pantalla) : null}
+                                                    { datosCapturados.tienda ==='comercial' ? cabecera_comercial(ancho_pantalla) : null}
+                                                    
+                                                    <p className='lista_remision_cliente' style={{fontWeight:'bold'}}> {item.cliente} </p>
+                                                    <div style={{display:'flex',justifyContent:'space-around',fontSize:letra_chica}}>                                                        
+                                                        <p className='lista_remision_fecha'> {item.fecha} </p>                                                         
+                                                        <p className='lista_remision_folio'> FOLIO:  {item.folio} </p>                                                        
+                                                    </div>
+                                                    <div>
+                                                        <hr></hr>
+                                                        {remisiones_Creadas[fecha] && remisiones_Creadas[fecha].map((item2, index2) =>
+                                                            (item2.folio === item.folio) ?
+                                                                <div key={index2}>
+                                                                    <div className='fila' >
+                                                                        <p className='remisiones_cantidad'> {item2.cantidad} </p>
+                                                                        <p className='remisiones_producto'> {item2.empaque} {item2.producto} </p>                                                                        
+                                                                    </div>
+                                                                    <div className='fila' style={{width:ancho_pantalla,display:'flex',justifyContent:'space-between'}} >                                                                        
+                                                                        <p style={{marginLeft:'40px', fontSize:letra_chica}} >Tasa: {item2.tasa}% </p>            
+                                                                        <p className='remisiones_total' style={{marginRight:'15px'}}>$ {item2.total.toFixed(2)} </p> 
+                                                                    </div>
+                                                                </div>
+                                                            :
+                                                                null
+                                                                )}
+                                                        <hr></hr>
+
+                                                        <div className='fila' style={{fontSize:letra_chica}}>
+                                                            <p className='lista_remision_total'> TASA 0%: $ </p> 
+                                                            <p className='lista_remision_total' style={{width:'150px'}}> {item.tasas.tasa0.toFixed(2)} </p> 
+                                                        </div>
+                                                        <div className='fila' style={{fontSize:letra_chica}}>
+                                                            <p className='lista_remision_total'> IVA: $ </p> 
+                                                            <p className='lista_remision_total' style={{width:'150px'}}> {item.tasas.tasa16.toFixed(2)} </p> 
+                                                        </div>
+                                                        <div className='fila' style={{fontSize:letra_chica}}>
+                                                            <p className='lista_remision_total'> IEPS: $ </p> 
+                                                            <p className='lista_remision_total' style={{width:'150px'}}> {item.tasas.tasa8.toFixed(2)} </p> 
+                                                        </div>
+                                                        <div className='fila'style={{fontWeight:'bold'}}>
+                                                            <p className='lista_remision_total'> TOTAL: $ </p> 
+                                                            <p className='lista_remision_total' style={{width:'150px'}}> {item.total.toFixed(2)} </p> 
+                                                        </div>
+
+                                                        <div>
+                                                            <p style={{textAlign:'center',marginBottom:'50px'}}>GRACIAS POR SU COMPRA</p>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>)
+                }
+                <p > ** {datosCapturados.tienda} ** </p>
+                <p >{ordernarFecha(datosCapturados.fecha)}</p>
+                <p >Folios: {folioini} - {foliofin}</p>
+                <p >Total: {convertirAPesos(total)}</p>                  
+                <p >-- Tasa 0: {convertirAPesos(total-iva-ieps)}</p>
+                <p >-- IVA:    {convertirAPesos(iva)}</p>
+                <p >-- IEPS:   {convertirAPesos(ieps)}</p>
+
+                <div>                 
+                    <button className='boton' 
+                    onClick={() => regresar()} 
+                    onMouseEnter={(e) => changeBack(e)}
+                    onMouseLeave={(e) => changeBack(e)}                  
+                    >regresar</button>                     
+                </div>              
+        </div>      
+    </div>
+    
+    //necesito regresar las notas creadas en resul
+    //y el desglose de los totales en total iva e ipes porque useState renderiza muchas veces y no funciono
+    return({resul:resul,total:total, iva:iva, ieps:ieps})                                          
+    }
+
+  const generarDatos = (data) =>{
+    let error = ''
+    let total = parseFloat(data.total)
+    let iva = parseFloat(data.iva)
+    let ieps = parseFloat(data.ieps)
+    let notas = parseInt(data.notas)
+  
+    setMostrarUno(false) // oculta lista de reimpresion individual si esta visible 
+   
+    if (data.fecha.length === 0)
+      error ='necesitas seleccionar fecha \n'
+  
+    if (data.tienda === 'nada')
+      error += 'necesitas seleccionar tienda \n'
+    
+    if (total<1 ||  data.total.length === 0)
+      error += 'necesitas total \n'
+  
+    if (iva>total ||  data.iva.length === 0)
+      error += 'Error con el IVA \n'
+  
+    if (ieps>total ||  data.ieps.length === 0)
+      error += 'Error con el IEPS \n'
+  
+    if ((iva + ieps)>total)
+      error += 'La suma de IVA e IEPS supera a la cantidad total \n'
+    
+    if (notas<1 || data.notas.length === 0)
+      error += 'Pon el numero de notas que necesitas \n'
+    
+    if (data.excedente.length === 0)
+      error += 'Pon el total excedente permitido por nota'      
+  
+    if (error) 
+      alert(error)
+    else //despues de validar la informacion hacemos los calculos
+      {
+        //Verifico que no se haya hecho foliadas ese dia        
+    
+        Sqlite.reimprimir(data.tienda, data.fecha).then(e =>{                        
+          if (e === 0) {
+            const {listaRemisiones, remisiones} =ObtenerNotas.obtenerNotas(data,productos,empaques,folio,clientes)                      
+            setlistaRemision_Creada((prev) => ({
+                ...prev,
+                [data.fechaNormal]:listaRemisiones
+            }));
+               
+            setRemisiones_Creadas((prev) => ({
+                ...prev,
+                [data.fechaNormal]:remisiones
+            }));             
+          }
+          else{
+            alert('Ya se hizo foliadas de este dia')            
+          }
+        })
+         
+      }
+  
+  }
+
   const recorrerFechas = () => {
     let currentDate = new Date(datosCapturados.fecha);
     let finalDate = new Date(datosCapturados.fechaFin);
@@ -309,71 +500,84 @@ function App() {
     finalDate.setDate(finalDate.getDate() + 1);
       
     while (currentDate <= finalDate) {  
+      const fechaStr = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
       if (currentDate.getDay() !== 0) {
         bloques.push(
-          <div key={currentDate} >
+          <div key={fechaStr} >
             <p className='texto_dias'>
-              {`${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`}
+              {fechaStr}
             </p>
             <div className='fila' style={{gap:'15px', marginBottom:'20px'}}>
               <input
                 type='number'
                 placeholder='Total'
+                name='total'
                 className='caja_texto'
                 style={{ width: '120px', height: '25px' }}
-                value={datosCapturados.total}
+                value={datosCapturados[fechaStr] && datosCapturados[fechaStr].total ? datosCapturados[fechaStr].total : ''}
                 onChange={(e) =>
-                  setDatosCapturados({ ...datosCapturados, total: e.target.value })
+                  handleInputChange(fechaStr, e)
                 }
               />
               <input
                 type='number'
                 placeholder='IVA'
+                name='iva'
                 className='caja_texto'
                 style={{ width: '120px', height: '25px' }}
-                value={datosCapturados.iva}
+                value={datosCapturados[fechaStr] && datosCapturados[fechaStr].iva ? datosCapturados[fechaStr].iva : ''}
                 onChange={(e) =>
-                  setDatosCapturados({ ...datosCapturados, iva: e.target.value })
+                  handleInputChange(fechaStr, e)
                 }
               />
               <input
                 type='number'
                 placeholder='IEPS'
+                name='ieps'
                 className='caja_texto'
                 style={{ width: '120px', height: '25px' }}
-                value={datosCapturados.ieps}
+                value={datosCapturados[fechaStr] && datosCapturados[fechaStr].ieps ? datosCapturados[fechaStr].ieps : ''}
                 onChange={(e) =>
-                  setDatosCapturados({ ...datosCapturados, ieps: e.target.value })
+                  handleInputChange(fechaStr, e)
                 }
               />
               <input
                 type='number'
                 placeholder='# notas'
                 className='caja_texto'
+                name='notas'
                 style={{ width: '120px', height: '25px' }}
-                value={datosCapturados.notas}
+                value={datosCapturados[fechaStr] && datosCapturados[fechaStr].notas ? datosCapturados[fechaStr].notas : ''}
                 onChange={(e) =>
-                  setDatosCapturados({ ...datosCapturados, notas: e.target.value })
+                  handleInputChange(fechaStr, e)
                 }
               />
               <input
                 type='number'
                 placeholder='Excedente'
+                name='excedente'
                 className='caja_texto'
                 style={{ width: '120px', height: '25px' }}
-                value={datosCapturados.excedente}
+                value={datosCapturados[fechaStr] && datosCapturados[fechaStr].excedente ? datosCapturados[fechaStr].excedente : ''}
                 onChange={(e) =>
-                  setDatosCapturados({
-                    ...datosCapturados,
-                    excedente: e.target.value,
-                  })
+                  handleInputChange(fechaStr, e)
                 }
               />
 
               <button className='boton_generar' 
-                onClick={() => obtenerDatos()}                 
+                onClick={() => obtenerDatosLinea(fechaStr)}                 
               >Generar</button>
-            </div>
+            </div>            
+
+            {listaRemision_Creada[fechaStr] &&
+              <div>
+                <div style={{lineHeight:'5px'}}>
+                  <p className='texto_inicio' style={{fontSize:'20px',color:'rgba(6, 4, 31, 0.81)'}}>Numero de notas: {listaRemision_Creada[fechaStr].length} </p>                  
+                  <p className='texto_inicio' style={{fontSize:'20px',color:'rgba(6, 4, 31, 0.81)'}}>total: {convertirAPesos(mostrarListaRemisiones(fechaStr).total)} </p>
+                  <p className='texto_inicio' style={{fontSize:'20px',color:'rgba(6, 4, 31, 0.81)'}}>tasa0: {convertirAPesos((mostrarListaRemisiones(fechaStr).total-mostrarListaRemisiones(fechaStr).iva-mostrarListaRemisiones(fechaStr).ieps))} - iva: {convertirAPesos(mostrarListaRemisiones(fechaStr).iva)} - ieps: {convertirAPesos(mostrarListaRemisiones(fechaStr).ieps)}</p> 
+                </div>                
+              </div>
+            }
 
           </div>
         );
@@ -389,7 +593,6 @@ function App() {
       }
       currentDate.setDate(currentDate.getDate() + 1);
     }
-    console.log({bloques})
     return bloques;
   }
 
@@ -492,106 +695,6 @@ function App() {
             }
 
     </div>
-
-const mostrarListaRemisiones = () =>{    
-  let total=0, iva = 0, ieps = 0, folioini=0, foliofin=0
-  let ancho_pantalla = '350px', letra_chica = '13px'
-  let resul=
-  <div>
-                          
-          <button className='boton' 
-            onClick={() => regresar()} 
-            onMouseEnter={(e) => changeBack(e)}
-            onMouseLeave={(e) => changeBack(e)}                  
-          >regresar</button>                     
-          
-
-          <div style={{width:ancho_pantalla}}> {/* ancho de la hoja de impresion */}
-              {listaRemision_Creada.map((item, index) =>  <div key={index}>                                                  
-                                                  
-                                                  <div style={{display:'none'}}> {/* muestra en pantalla los acumuladores */}
-                                                      {index === 0 ? folioini = item.folio : foliofin = item.folio}
-                                                      { iva += item.tasas.tasa16}
-                                                      { ieps += item.tasas.tasa8 }
-                                                      { total += item.total}
-                                                  </div>
-
-                                                  {/* verifico que tienda es para poner su encabezado */}
-                                                  { datosCapturados.tienda ==='matriz' ? cabecera_matriz(ancho_pantalla) : null}
-                                                  { datosCapturados.tienda ==='mercado' ? cabecera_mercado(ancho_pantalla) : null}
-                                                  { datosCapturados.tienda ==='lorena' ? cabecera_lorena(ancho_pantalla) : null}
-                                                  { datosCapturados.tienda ==='comercial' ? cabecera_comercial(ancho_pantalla) : null}
-                                                  
-                                                  <p className='lista_remision_cliente' style={{fontWeight:'bold'}}> {item.cliente} </p>
-                                                  <div style={{display:'flex',justifyContent:'space-around',fontSize:letra_chica}}>                                                        
-                                                      <p className='lista_remision_fecha'> {item.fecha} </p>                                                         
-                                                      <p className='lista_remision_folio'> FOLIO:  {item.folio} </p>                                                        
-                                                  </div>
-                                                  <div>
-                                                      <hr></hr>
-                                                      {remisiones_Creadas.map((item2, index2) =>
-                                                          (item2.folio === item.folio) ?
-                                                              <div key={index2}>
-                                                                  <div className='fila' >
-                                                                      <p className='remisiones_cantidad'> {item2.cantidad} </p>
-                                                                      <p className='remisiones_producto'> {item2.empaque} {item2.producto} </p>                                                                        
-                                                                  </div>
-                                                                  <div className='fila' style={{width:ancho_pantalla,display:'flex',justifyContent:'space-between'}} >                                                                        
-                                                                      <p style={{marginLeft:'40px', fontSize:letra_chica}} >Tasa: {item2.tasa}% </p>            
-                                                                      <p className='remisiones_total' style={{marginRight:'15px'}}>$ {item2.total.toFixed(2)} </p> 
-                                                                  </div>
-                                                              </div>
-                                                          :
-                                                              null
-                                                            )}
-                                                      <hr></hr>
-
-                                                      <div className='fila' style={{fontSize:letra_chica}}>
-                                                          <p className='lista_remision_total'> TASA 0%: $ </p> 
-                                                          <p className='lista_remision_total' style={{width:'150px'}}> {item.tasas.tasa0.toFixed(2)} </p> 
-                                                      </div>
-                                                      <div className='fila' style={{fontSize:letra_chica}}>
-                                                          <p className='lista_remision_total'> IVA: $ </p> 
-                                                          <p className='lista_remision_total' style={{width:'150px'}}> {item.tasas.tasa16.toFixed(2)} </p> 
-                                                      </div>
-                                                      <div className='fila' style={{fontSize:letra_chica}}>
-                                                          <p className='lista_remision_total'> IEPS: $ </p> 
-                                                          <p className='lista_remision_total' style={{width:'150px'}}> {item.tasas.tasa8.toFixed(2)} </p> 
-                                                      </div>
-                                                      <div className='fila'style={{fontWeight:'bold'}}>
-                                                          <p className='lista_remision_total'> TOTAL: $ </p> 
-                                                          <p className='lista_remision_total' style={{width:'150px'}}> {item.total.toFixed(2)} </p> 
-                                                      </div>
-
-                                                      <div>
-                                                        <p style={{textAlign:'center',marginBottom:'50px'}}>GRACIAS POR SU COMPRA</p>
-                                                      </div>
-                                                      
-                                                  </div>
-                                              </div>)
-              }
-              <p > ** {datosCapturados.tienda} ** </p>
-              <p >{ordernarFecha(datosCapturados.fecha)}</p>
-              <p >Folios: {folioini} - {foliofin}</p>
-              <p >Total: {convertirAPesos(total)}</p>                  
-              <p >-- Tasa 0: {convertirAPesos(total-iva-ieps)}</p>
-              <p >-- IVA:    {convertirAPesos(iva)}</p>
-              <p >-- IEPS:   {convertirAPesos(ieps)}</p>
-
-              <div>                 
-                <button className='boton' 
-                  onClick={() => regresar()} 
-                  onMouseEnter={(e) => changeBack(e)}
-                  onMouseLeave={(e) => changeBack(e)}                  
-                >regresar</button>                     
-              </div>              
-    </div>      
-  </div>
-  
-  //necesito regresar las notas creadas en resul
-  //y el desglose de los totales en total iva e ipes porque useState renderiza muchas veces y no funciono
-  return({resul:resul,total:total, iva:iva, ieps:ieps})                                          
-}
 
 const listaIndividual = () => {
   let resul = '', folioini= '', foliofin=''
