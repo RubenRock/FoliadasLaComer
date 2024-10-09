@@ -29,6 +29,7 @@ function App() {
   const [folio, setFolio] = useState(0)
   const [modificarFolio, setModificarFolio] = useState(false)
   const [mostrarSql, setMostrarSql ] = useState (false)
+  const [fechas, setFechas ] = useState ([]);// almacenas el rango de fechas que elige el usuario
   
   const leerDatos = async () =>{
     setEmpaques([])
@@ -45,61 +46,8 @@ function App() {
     setEmpaques(empaque) 
   }
 
-  const obtenerDatos = () =>{
-    let error = ''
-    let total = parseFloat(datosCapturados.total)
-    let iva = parseFloat(datosCapturados.iva)
-    let ieps = parseFloat(datosCapturados.ieps)
-    let notas = parseInt(datosCapturados.notas)
-  
-    setMostrarUno(false) // oculta lista de reimpresion individual si esta visible 
-   
-    if (datosCapturados.fecha.length === 0)
-      error ='necesitas seleccionar fecha \n'
-  
-    if (datosCapturados.tienda === 'nada')
-      error += 'necesitas seleccionar tienda \n'
-    
-    if (total<1 ||  datosCapturados.total.length === 0)
-      error += 'necesitas total \n'
-  
-    if (iva>total ||  datosCapturados.iva.length === 0)
-      error += 'Error con el IVA \n'
-  
-    if (ieps>total ||  datosCapturados.ieps.length === 0)
-      error += 'Error con el IEPS \n'
-  
-    if ((iva + ieps)>total)
-      error += 'La suma de IVA e IEPS supera a la cantidad total \n'
-    
-    if (notas<1 || datosCapturados.notas.length === 0)
-      error += 'Pon el numero de notas que necesitas \n'
-    
-    if (datosCapturados.excedente.length === 0)
-      error += 'Pon el total excedente permitido por nota'      
-  
-    if (error) 
-      alert(error)
-    else //despues de validar la informacion hacemos los calculos
-      {
-        //Verifico que no se haya hecho foliadas ese dia  
-        let fe = datosCapturados.fecha
-        //2021/10/15
-        let ordernaFecha = fe[8]+fe[9]+'-'+fe[5]+ fe[6]+'-'+fe[0]+ fe[1]+ fe[2]+ fe[3] 
-    
-        Sqlite.reimprimir(datosCapturados.tienda,ordernaFecha).then(e =>{                        
-          if (e === 0) {
-            const {listaRemisiones, remisiones} =ObtenerNotas.obtenerNotas(datosCapturados,productos,empaques,folio,clientes)                      
-            setlistaRemision_Creada(listaRemisiones)
-            setRemisiones_Creadas(remisiones)            
-          }
-          else{
-            alert('Ya se hizo foliadas de este dia')            
-          }
-        })
-         
-      }
-  
+  const crearNotas = () =>{
+    console.log(fechas)
   }
 
   const changeBack = (e) =>{
@@ -494,7 +442,7 @@ function App() {
   const recorrerFechas = () => {
     let currentDate = new Date(datosCapturados.fecha);
     let finalDate = new Date(datosCapturados.fechaFin);
-    let bloques = [];
+    let bloques = [];let rangoFechas = [];
     //le agrego un dia porque empieza en un dia anterior
     currentDate.setDate(currentDate.getDate() + 1);
     finalDate.setDate(finalDate.getDate() + 1);
@@ -502,6 +450,7 @@ function App() {
     while (currentDate <= finalDate) {  
       const fechaStr = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
       if (currentDate.getDay() !== 0) {
+        rangoFechas.push(fechaStr);//guardo la fecha sin el domingo
         bloques.push(
           <div key={fechaStr} >
             <p className='texto_dias'>
@@ -591,8 +540,10 @@ function App() {
           </div>
         )
       }
-      currentDate.setDate(currentDate.getDate() + 1);
+      currentDate.setDate(currentDate.getDate() + 1);      
     }
+    //setFechas(rangoFechas);
+    console.log('que pasa')
     return bloques;
   }
 
@@ -666,10 +617,8 @@ function App() {
             </div>
 
             <div>
-              <button className='boton' 
-                onClick={() => obtenerDatos()} 
-                onMouseEnter={(e) => changeBack(e)}
-                onMouseLeave={(e) => changeBack(e)}
+              <button className='boton' style={{cursor:'pointer'}}
+                onClick={() => crearNotas()}                 
               >Crear</button>
 
               <p className='texto_sql'
