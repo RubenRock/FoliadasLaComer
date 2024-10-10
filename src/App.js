@@ -47,7 +47,44 @@ function App() {
   }
 
   const crearNotas = () =>{
-    console.log(fechas)
+    let currentDate = new Date(datosCapturados.fecha);
+    let finalDate = new Date(datosCapturados.fechaFin);
+    let rangoFechas = [];
+    let messageError = '';
+
+    //le agrego un dia porque empieza en un dia anterior
+    currentDate.setDate(currentDate.getDate() + 1);
+    finalDate.setDate(finalDate.getDate() + 1);
+      
+    while (currentDate <= finalDate) {  
+      const fechaStr = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+      if (currentDate.getDay() !== 0) {
+        rangoFechas.push(fechaStr);//guardo la fecha sin el domingo
+      } 
+      currentDate.setDate(currentDate.getDate() + 1);     
+    }
+    
+    //verifico que todas las fechas tengan creadas sus notas
+    rangoFechas.forEach((item, index) =>{
+      const numeroNotas = listaRemision_Creada[rangoFechas[index]] ? listaRemision_Creada[rangoFechas[index]].length : 0;
+      if (numeroNotas == 0)
+        messageError += rangoFechas[index]+', ';       
+    })   
+
+    //si hay error, no creo las foliadas
+    if (messageError){
+      messageError.slice(0, -2);
+      messageError += 'no tienen datos';
+      alert(messageError);
+    }else{
+      rangoFechas.forEach((item, index) =>{
+                                //lista Remisiones                      //remisiones                          //fecha
+        guardarFoliadas(listaRemision_Creada[rangoFechas[index]], remisiones_Creadas[rangoFechas[index]], rangoFechas[index]);
+      })
+    }
+
+    
+    
   }
 
   const changeBack = (e) =>{
@@ -165,11 +202,12 @@ function App() {
     setFolio(await Sqlite.folioMax(tienda))    
   }   
 
-  const guardarFoliadas = () =>{       
+  const guardarFoliadas = (listaRemision, remisiones, fecha) =>{       
    
-      setImprimir(true)
-      Sqlite.crearTablas()
-      Sqlite.insertarDatos(listaRemision_Creada,remisiones_Creadas)
+      //setImprimir(true)      
+      Sqlite.insertarDatos(listaRemision,remisiones).then(x =>{
+        console.log(fecha + ' agregado');
+      })
     
       //Sqlite.borrarTablas()
   }
@@ -442,15 +480,14 @@ function App() {
   const recorrerFechas = () => {
     let currentDate = new Date(datosCapturados.fecha);
     let finalDate = new Date(datosCapturados.fechaFin);
-    let bloques = [];let rangoFechas = [];
+    let bloques = [];
     //le agrego un dia porque empieza en un dia anterior
     currentDate.setDate(currentDate.getDate() + 1);
     finalDate.setDate(finalDate.getDate() + 1);
       
     while (currentDate <= finalDate) {  
       const fechaStr = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
-      if (currentDate.getDay() !== 0) {
-        rangoFechas.push(fechaStr);//guardo la fecha sin el domingo
+      if (currentDate.getDay() !== 0) {        
         bloques.push(
           <div key={fechaStr} >
             <p className='texto_dias'>
@@ -542,12 +579,11 @@ function App() {
       }
       currentDate.setDate(currentDate.getDate() + 1);      
     }
-    //setFechas(rangoFechas);
-    console.log('que pasa')
+    
     return bloques;
   }
 
-  const pantalla_principal = 
+  const pantalla_principal = () => (
     <div>
             <div className="topnav">
               <a onClick={() => limpiar()}>Limpiar</a>
@@ -644,6 +680,7 @@ function App() {
             }
 
     </div>
+  )
 
 const listaIndividual = () => {
   let resul = '', folioini= '', foliofin=''
@@ -683,7 +720,7 @@ const listaIndividual = () => {
             {/* para imprimir quito la pantalla principal */}                        
             { !imprimir && !reimprimir ? 
                 <div>
-                {pantalla_principal}
+                {pantalla_principal()}
                 
                 {/* lista de remisiones para elegir cual reimprimir individualmente */}
                 {mostrarUno ?                    
