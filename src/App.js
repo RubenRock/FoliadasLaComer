@@ -75,10 +75,7 @@ function App() {
       messageError += 'no tienen datos';
       alert(messageError);
     }else{
-      rangoFechas.forEach((item, index) =>{
-                                //lista Remisiones                      //remisiones                          //fecha
-        guardarFoliadas(listaRemision_Creada[rangoFechas[index]], remisiones_Creadas[rangoFechas[index]], rangoFechas[index]);
-      })
+      guardarFoliadas();      
     }
 
     
@@ -143,7 +140,7 @@ function App() {
     setlistaRemision_Creada('')
     let fe = datosCapturados.fecha
     //2021/10/15
-    let ordernaFecha = fe[8]+fe[9]+'-'+fe[5]+ fe[6]+'-'+fe[0]+ fe[1]+ fe[2]+ fe[3] 
+    let ordernaFecha = fe[8]+fe[9]+'-'+fe[5]+ fe[6]+'-'+fe[0]+ fe[1]+ fe[2]+ fe[3]
 
     Sqlite.reimprimir(datosCapturados.tienda,ordernaFecha).then(e =>{        
       if (e === 0) alert('No hay datos para mostrar')    
@@ -208,9 +205,7 @@ function App() {
     let folioAnterior = 1;
     let folioActualizado = 0;
 
-    for (const fecha in listaRemision) {
-      console.log(`Fecha: ${fecha}`);    
-      
+    for (const fecha in listaRemision) {      
       listaRemision[fecha].forEach((remision) => {
         remision.folio = indexLista + folio;        
         indexLista += 1;
@@ -219,8 +214,8 @@ function App() {
       remisiones[fecha].forEach((remision) => {
         const folioActual = remision.folio;        
         if (folioAnterior == 0 || folioAnterior < folioActual){
-          folioAnterior = folioActual;                      //
-          remision.folio = indexRemisiones + folio;        //
+          folioAnterior = folioActual;
+          remision.folio = indexRemisiones + folio;
           indexRemisiones += 1;
         }else if(folioAnterior > folioActual){
           if (folioActual != folioActualizado){
@@ -235,15 +230,20 @@ function App() {
     return {listaRemision:listaRemision, remisiones:remisiones}
   }
 
-  const guardarFoliadas = (listaRemision2, remisiones2, fecha) =>{       
-      console.log(listaRemision_Creada)
-      console.log(remisiones_Creadas)
-      console.log('------------')
+  const guardarFoliadas = () =>{  
       const {listaRemision, remisiones} = actualizarFolios()
    
       //setImprimir(true)  
       console.log(listaRemision)
       console.log(remisiones)
+
+      for (const fecha in listaRemision) {
+        
+        Sqlite.insertarDatos(listaRemision[fecha],remisiones[fecha]).then(x =>{
+          console.log(fecha + 'agregado');
+        })
+
+      }
 
       /* Sqlite.insertarDatos(listaRemision,remisiones).then(x =>{
         console.log(fecha + ' agregado');
@@ -517,6 +517,25 @@ function App() {
   
   }
 
+  const verificarDias = () =>{
+    let currentDate = new Date(datosCapturados.fecha);
+    let finalDate = new Date(datosCapturados.fechaFin);    
+    const fe = datosCapturados.fecha;
+    let ordernaFecha = fe[8]+fe[9]+'-'+fe[5]+ fe[6]+'-'+fe[0]+ fe[1]+ fe[2]+ fe[3]
+
+    while (currentDate <= finalDate) {  
+      Sqlite.reimprimir(datosCapturados.tienda, ordernaFecha).then(e =>{                                
+        console.log(currentDate.getDate())
+        console.log(e)
+        if (e) {                  
+          return currentDate.getDate()
+        }
+      })
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return 0;
+  }
+
   const recorrerFechas = () => {
     let currentDate = new Date(datosCapturados.fecha);
     let finalDate = new Date(datosCapturados.fechaFin);
@@ -524,6 +543,13 @@ function App() {
     //le agrego un dia porque empieza en un dia anterior
     currentDate.setDate(currentDate.getDate() + 1);
     finalDate.setDate(finalDate.getDate() + 1);
+
+    const verificar = verificarDias();
+    if (verificar != 0)
+      alert('ya hay foliadas el '+verificar)
+    else
+      alert('pasale mi hermano')
+    
       
     while (currentDate <= finalDate) {  
       const fechaStr = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
