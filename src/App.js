@@ -5,7 +5,6 @@ import './App.css';
 import {useEffect, useState} from 'react'
 import logoComer from './img/logo_comer.png'
 import home_img from './img/home.svg'
-import report_img from './img/report.svg'
 import printer from './img/printer.svg'
 
 import * as ObtenerNotas from './components/obtenerNotas'
@@ -28,8 +27,7 @@ function App() {
   const [mostrarUno, setMostrarUno] = useState(false) //no mostrar la lista de reimpresion individual de notas
   const [folio, setFolio] = useState(0)
   const [modificarFolio, setModificarFolio] = useState(false)
-  const [mostrarSql, setMostrarSql ] = useState (false)
-  const [fechas, setFechas ] = useState ([]);// almacenas el rango de fechas que elige el usuario
+  const [mostrarSql, setMostrarSql ] = useState (false)  
   
   const leerDatos = async () =>{
     setEmpaques([])
@@ -111,7 +109,7 @@ function App() {
   }
 
   const limpiar = () =>{
-    setDatosCapturados({'tienda':'nada','total':'','iva':'','ieps':'','notas':'','excedente':'', 'fecha':''})
+    setDatosCapturados({'tienda':'nada','fecha':'', 'fechaFin':''})
     setlistaRemision_Creada([])
     setRemisiones_Creadas([])
     setReimprimirListaRemision([])
@@ -202,12 +200,54 @@ function App() {
     setFolio(await Sqlite.folioMax(tienda))    
   }   
 
-  const guardarFoliadas = (listaRemision, remisiones, fecha) =>{       
+  const actualizarFolios = () =>{
+    let listaRemision = listaRemision_Creada;
+    let remisiones = remisiones_Creadas;
+    let indexLista = 1;
+    let indexRemisiones = 1;
+    let folioAnterior = 1;
+    let folioActualizado = 0;
+
+    for (const fecha in listaRemision) {
+      console.log(`Fecha: ${fecha}`);    
+      
+      listaRemision[fecha].forEach((remision) => {
+        remision.folio = indexLista + folio;        
+        indexLista += 1;
+      });     
+
+      remisiones[fecha].forEach((remision) => {
+        const folioActual = remision.folio;        
+        if (folioAnterior == 0 || folioAnterior < folioActual){
+          folioAnterior = folioActual;                      //
+          remision.folio = indexRemisiones + folio;        //
+          indexRemisiones += 1;
+        }else if(folioAnterior > folioActual){
+          if (folioActual != folioActualizado){
+            folioAnterior += 1;            
+            folioActualizado = folioActual
+          }
+          remision.folio = folioAnterior;          
+        }
+      }); 
+    }   
+
+    return {listaRemision:listaRemision, remisiones:remisiones}
+  }
+
+  const guardarFoliadas = (listaRemision2, remisiones2, fecha) =>{       
+      console.log(listaRemision_Creada)
+      console.log(remisiones_Creadas)
+      console.log('------------')
+      const {listaRemision, remisiones} = actualizarFolios()
    
-      //setImprimir(true)      
-      Sqlite.insertarDatos(listaRemision,remisiones).then(x =>{
+      //setImprimir(true)  
+      console.log(listaRemision)
+      console.log(remisiones)
+
+      /* Sqlite.insertarDatos(listaRemision,remisiones).then(x =>{
         console.log(fecha + ' agregado');
-      })
+      }) */
     
       //Sqlite.borrarTablas()
   }
