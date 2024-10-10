@@ -125,7 +125,7 @@ export const crearTablas = () => {
         const keyRange = IDBKeyRange.only(tienda);
         const cursorRequest = index.openCursor(keyRange, 'prev');
   
-        let folio = 0;
+        let folio = 0;let fecha = '';
   
         cursorRequest.onsuccess = function(event) {
           const cursor = event.target.result;
@@ -133,10 +133,11 @@ export const crearTablas = () => {
             const record = cursor.value;
             if (record.folio > folio) {
               folio = record.folio;
+              fecha = record.fecha
             }
             cursor.continue();
           } else {
-            resolve(folio);
+            resolve({folio:folio, fecha:fecha});
             db.close();
           }
         };

@@ -27,7 +27,7 @@ function App() {
   const [mostrarUno, setMostrarUno] = useState(false) //no mostrar la lista de reimpresion individual de notas
   const [folio, setFolio] = useState(0)
   const [modificarFolio, setModificarFolio] = useState(false)
-  const [mostrarSql, setMostrarSql ] = useState (false)  
+  const [mostrarSql, setMostrarSql ] = useState (false)    
   
   const leerDatos = async () =>{
     setEmpaques([])
@@ -93,9 +93,7 @@ function App() {
   useEffect(() =>{
     leerDatos()    
     Sqlite.crearTablas()
-  },[]) 
-
-  
+  },[])  
 
   const ordernarFecha = (fecha) =>{    
     const mes=['enero','febrero','marzo','abril','mayo','junio','julio','agosto', 'septiembre','octubre', 'noviembre','diciembre']
@@ -193,8 +191,12 @@ function App() {
     })
   }
 
-  const leerFolio = async(tienda)=>{    
-    setFolio(await Sqlite.folioMax(tienda))    
+  const leerFolio = async(tienda)=>{        
+    const {folio, fecha} = await Sqlite.folioMax(tienda)
+
+    console.log(folio)
+    console.log(fecha)
+    //setFolio(await Sqlite.folioMax(tienda).folio)        
   }   
 
   const actualizarFolios = () =>{
@@ -461,9 +463,8 @@ function App() {
     let total = parseFloat(data.total)
     let iva = parseFloat(data.iva)
     let ieps = parseFloat(data.ieps)
-    let notas = parseInt(data.notas)
-  
-    setMostrarUno(false) // oculta lista de reimpresion individual si esta visible 
+    let notas = parseInt(data.notas) 
+    
    
     if (data.fecha.length === 0)
       error ='necesitas seleccionar fecha \n'
@@ -493,9 +494,13 @@ function App() {
       alert(error)
     else //despues de validar la informacion hacemos los calculos
       {
-        //Verifico que no se haya hecho foliadas ese dia        
+        
+        const [dia, mes, año] = data.fechaNormal.split('/');
+        // cambiar dd/mm/yyyy a dd-mm-yyyy para buscar en la bd
+        const fechaParaBuscar = `${dia}-${mes}-${año}`; //
     
-        Sqlite.reimprimir(data.tienda, data.fecha).then(e =>{                        
+        //Verifico que no se haya hecho foliadas ese dia        
+        Sqlite.reimprimir(data.tienda, fechaParaBuscar).then(e =>{                        
           if (e === 0) {
             const {listaRemisiones, remisiones} =ObtenerNotas.obtenerNotas(data,productos,empaques,folio,clientes)                      
             setlistaRemision_Creada((prev) => ({
@@ -518,22 +523,25 @@ function App() {
   }
 
   const verificarDias = () =>{
-    let currentDate = new Date(datosCapturados.fecha);
-    let finalDate = new Date(datosCapturados.fechaFin);    
-    const fe = datosCapturados.fecha;
-    let ordernaFecha = fe[8]+fe[9]+'-'+fe[5]+ fe[6]+'-'+fe[0]+ fe[1]+ fe[2]+ fe[3]
+    if (datosCapturados.fecha && datosCapturados.fechaFin && (datosCapturados.tienda != 'nada')){
+      let currentDate = new Date(datosCapturados.fecha);
+      let finalDate = new Date(datosCapturados.fechaFin);    
+      let tienda = datosCapturados.tienda      
 
-    while (currentDate <= finalDate) {  
-      Sqlite.reimprimir(datosCapturados.tienda, ordernaFecha).then(e =>{                                
-        console.log(currentDate.getDate())
-        console.log(e)
-        if (e) {                  
-          return currentDate.getDate()
-        }
-      })
-      currentDate.setDate(currentDate.getDate() + 1);
+      while (currentDate <= finalDate) {  
+        const ordernaFecha = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`;                        
+        Sqlite.reimprimir(tienda, ordernaFecha).then(e =>{                                                    
+          console.log(e.listaRemision)
+          if (e.listaRemision) {                  
+            return 33
+          }
+        })
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return 0;
+
     }
-    return 0;
+    
   }
 
   const recorrerFechas = () => {
@@ -542,14 +550,7 @@ function App() {
     let bloques = [];
     //le agrego un dia porque empieza en un dia anterior
     currentDate.setDate(currentDate.getDate() + 1);
-    finalDate.setDate(finalDate.getDate() + 1);
-
-    const verificar = verificarDias();
-    if (verificar != 0)
-      alert('ya hay foliadas el '+verificar)
-    else
-      alert('pasale mi hermano')
-    
+    finalDate.setDate(finalDate.getDate() + 1);    
       
     while (currentDate <= finalDate) {  
       const fechaStr = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
